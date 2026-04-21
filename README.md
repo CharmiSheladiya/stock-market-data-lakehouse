@@ -167,6 +167,3 @@ terraform apply -var="environment=dev"
 
 Creates: S3 bucket (versioned, encrypted, lifecycle rules), IAM role, Glue catalog, CloudWatch log group.
 
-## License
-
-MIT
