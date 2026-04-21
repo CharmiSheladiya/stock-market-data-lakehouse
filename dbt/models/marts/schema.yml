@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: fact_daily_performance
+    description: "Fact table — daily stock performance with technical indicators"
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+      - name: trade_date
+        tests:
+          - not_null
+      - name: close_price
+        tests:
+          - not_null
+    tests:
+      - unique:
+          column_name: "symbol || '-' || cast(trade_date as varchar)"
+
+  - name: agg_weekly_performance
+    description: "Weekly aggregated stock performance metrics"
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+      - name: week_start
+        tests:
+          - not_null

@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw ingested stock market data (Parquet files)"
+    tables:
+      - name: daily_prices
+        description: "Daily OHLCV prices from API ingestion"
+        columns:
+          - name: symbol
+            tests:
+              - not_null
+          - name: date
+            tests:
+              - not_null
+          - name: close
+            tests:
+              - not_null
+          - name: volume
+            tests:
+              - not_null

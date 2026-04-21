@@ -1,0 +1,19 @@
+name: 'stock_market_lakehouse'
+version: '1.0.0'
+config-version: 2
+
+profile: 'stock_market_lakehouse'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  lookback_days: 30

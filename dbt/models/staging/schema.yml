@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_daily_prices
+    description: "Staged and deduplicated daily stock prices"
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+      - name: trade_date
+        tests:
+          - not_null
+      - name: close_price
+        tests:
+          - not_null
+    tests:
+      - unique:
+          column_name: "symbol || '-' || cast(trade_date as varchar)"

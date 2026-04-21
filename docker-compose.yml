@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ------------------------------------------------------------------ #
+  #  API — FastAPI serving layer
+  # ------------------------------------------------------------------ #
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - minio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ------------------------------------------------------------------ #
+  #  MinIO — S3-compatible storage for local development
+  # ------------------------------------------------------------------ #
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ------------------------------------------------------------------ #
+  #  Prefect — orchestration server
+  # ------------------------------------------------------------------ #
+  prefect-server:
+    image: prefecthq/prefect:2-python3.11
+    ports:
+      - "4200:4200"
+    command: prefect server start --host 0.0.0.0
+    environment:
+      PREFECT_API_DATABASE_CONNECTION_URL: sqlite+aiosqlite:////data/prefect.db
+    volumes:
+      - prefect_data:/data
+
+  # ------------------------------------------------------------------ #
+  #  Pipeline worker — runs Prefect flows
+  # ------------------------------------------------------------------ #
+  worker:
+    build: .
+    command: prefect worker start --pool default-agent-pool
+    env_file: .env
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+    depends_on:
+      - prefect-server
+      - minio
+    volumes:
+      - ./data:/app/data
+
+volumes:
+  minio_data:
+  prefect_data:

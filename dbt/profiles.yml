@@ -1,0 +1,13 @@
+stock_market_lakehouse:
+  outputs:
+    dev:
+      type: duckdb
+      path: '../data/lakehouse.duckdb'
+      schema: main
+      threads: 4
+    prod:
+      type: duckdb
+      path: '../data/lakehouse_prod.duckdb'
+      schema: main
+      threads: 8
+  target: dev
